@@ -10,7 +10,7 @@ protected:
     int group_size;
     int tile_size;
 
-    std::unique_ptr<TiledMatrix<float>> matrix;
+    std::unique_ptr<TiledMatrix<float> > matrix;
 
     void fill_matrix(float value) {
         for (int r = 0; r < seq_len; ++r) {
@@ -47,7 +47,7 @@ TEST_F(MaskTest, TileFullyInMaskedRegion) {
     q_len = 32;
     group_size = 1;
     tile_size = 32;
-    matrix = std::make_unique<TiledMatrix<float>>(
+    matrix = std::make_unique<TiledMatrix<float> >(
         seq_len, q_len, group_size, tile_size);
     fill_matrix(1.0f);
 
@@ -68,9 +68,11 @@ TEST_F(MaskTest, TileFullyInMaskedRegion) {
     for (int r = 0; r < tile_size; ++r) {
         for (int c = 0; c < matrix->get_total_cols(); ++c) {
             int mask_j = c / group_size;
-            if (mask_j % 2 == 0) { // 偶数列块，应保留
+            if (mask_j % 2 == 0) {
+                // 偶数列块，应保留
                 EXPECT_FLOAT_EQ(tile_view.at(r, c), 1.0f);
-            } else { // 奇数列块，应置零
+            } else {
+                // 奇数列块，应置零
                 EXPECT_FLOAT_EQ(tile_view.at(r, c), 0.0f);
             }
         }
@@ -86,7 +88,7 @@ TEST_F(MaskTest, TileStraddlingMaskBoundary) {
     q_len = 30;
     group_size = 2;
     tile_size = 32;
-    matrix = std::make_unique<TiledMatrix<float>>(
+    matrix = std::make_unique<TiledMatrix<float> >(
         seq_len, q_len, group_size, tile_size);
     fill_matrix(1.0f);
 
@@ -103,9 +105,11 @@ TEST_F(MaskTest, TileStraddlingMaskBoundary) {
     for (int r = 0; r < tile_size; ++r) {
         const int global_row = tile_id * tile_size + r;
         for (int c = 0; c < matrix->get_total_cols(); ++c) {
-            if (global_row < 20) { // 在掩码区之前
+            if (global_row < 20) {
+                // 在掩码区之前
                 EXPECT_FLOAT_EQ(tile_view.at(r, c), 1.0f) << "Row " << r << " should not be masked.";
-            } else { // 在掩码区之内
+            } else {
+                // 在掩码区之内
                 EXPECT_FLOAT_EQ(tile_view.at(r, c), 0.0f) << "Row " << r << " should be masked.";
             }
         }
@@ -121,7 +125,7 @@ TEST_F(MaskTest, LastTileWithPadding) {
     q_len = 30;
     group_size = 1;
     tile_size = 32;
-    matrix = std::make_unique<TiledMatrix<float>>(
+    matrix = std::make_unique<TiledMatrix<float> >(
         seq_len, q_len, group_size, tile_size);
     fill_matrix(1.0f);
 
@@ -138,13 +142,17 @@ TEST_F(MaskTest, LastTileWithPadding) {
     for (int r = 0; r < tile_size; ++r) {
         const int global_row = tile_id * tile_size + r;
         for (int c = 0; c < matrix->get_total_cols(); ++c) {
-            if (global_row >= seq_len) { // Padding区域
+            if (global_row >= seq_len) {
+                // Padding区域
                 EXPECT_FLOAT_EQ(tile_view.at(r, c), 0.0f) << "Padding at row " << r << " should be zero.";
-            } else { // 有效数据区域 (全都在掩码区内)
+            } else {
+                // 有效数据区域 (全都在掩码区内)
                 int mask_j = c / group_size;
-                if (mask_j == 0) { // 第0列保留
+                if (mask_j == 0) {
+                    // 第0列保留
                     EXPECT_FLOAT_EQ(tile_view.at(r, c), 1.0f);
-                } else { // 其他列置零
+                } else {
+                    // 其他列置零
                     EXPECT_FLOAT_EQ(tile_view.at(r, c), 0.0f);
                 }
             }
@@ -162,7 +170,7 @@ TEST_F(MaskTest, TileBeforeMaskRegion) {
     q_len = 32;
     group_size = 1;
     tile_size = 32;
-    matrix = std::make_unique<TiledMatrix<float>>(
+    matrix = std::make_unique<TiledMatrix<float> >(
         seq_len, q_len, group_size, tile_size);
     fill_matrix(1.0f);
 

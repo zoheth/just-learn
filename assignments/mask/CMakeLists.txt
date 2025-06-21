@@ -4,11 +4,11 @@ add_executable(mask
         ref_impl.cpp)
 
 target_sources(mask PRIVATE
-    tests.cpp
+        tests.cpp
 )
 
 target_include_directories(mask PRIVATE
-    ${PROJECT_SOURCE_DIR}
+        ${PROJECT_SOURCE_DIR}
 )
 
 target_link_libraries(mask PRIVATE GTest::gtest_main)
